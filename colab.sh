@@ -51,6 +51,9 @@ nohup python3 /tmp/hazfwd.py >/tmp/hazfwd.log 2>&1 &
 sleep 2
 
 pip -q install vllm
+# Colab preinstalls a torchaudio built for a different CUDA than its torch; it is
+# not needed for text inference and otherwise crashes vLLM on import.
+pip -q uninstall -y torchaudio 2>/dev/null || true
 nohup vllm serve "$MODEL" --port 8000 --max-model-len 8192 >/tmp/vllm.log 2>&1 &
 echo "waiting for vLLM (downloads the model on first run)..."
 until curl -s http://localhost:8000/v1/models >/dev/null 2>&1; do sleep 5; done
